@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableRow, TextField, Button, Container } from '@mui/material';
+import {
+    Table, TableBody, TableCell, TableHead, TableRow,
+    TextField, Button, Paper, Typography
+} from '@mui/material';
 import { getParkingSpots } from '../services/parking-spots';
 import { ParkingSpot } from '../types';
 import ReservationDialog from './ReservationDialog';
+import Layout from './Layout';
 
 const ParkingSpotTable: React.FC = () => {
     const [parkingSpots, setParkingSpots] = useState<ParkingSpot[]>([]);
@@ -22,9 +26,8 @@ const ParkingSpotTable: React.FC = () => {
     }, []);
 
     const handleReservationCreated = () => {
-        // Отправляем событие для обновления бронирований в ReservationHistory
         window.dispatchEvent(new Event('reservationUpdated'));
-        setSelectedSpot(null); // Закрываем диалог
+        setSelectedSpot(null);
     };
 
     const filteredSpots = parkingSpots.filter(spot =>
@@ -32,39 +35,43 @@ const ParkingSpotTable: React.FC = () => {
     );
 
     return (
-        <Container sx={{ mt: 4 }}>
-            <TextField
-                label="Поиск по локации"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                fullWidth
-                margin="normal"
-            />
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>ID</TableCell>
-                        <TableCell>Локация</TableCell>
-                        <TableCell>Действие</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {filteredSpots.map(spot => (
-                        <TableRow key={spot.id}>
-                            <TableCell>{spot.id}</TableCell>
-                            <TableCell>{spot.location}</TableCell>
-                            <TableCell>
-                                <Button
-                                    variant="contained"
-                                    onClick={() => setSelectedSpot(spot)}
-                                >
-                                    Забронировать
-                                </Button>
-                            </TableCell>
+        <Layout>
+            <Typography variant="h5" gutterBottom>Список парковочных мест</Typography>
+            <Paper sx={{ p: 2 }}>
+                <TextField
+                    label="Поиск по локации"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    fullWidth
+                    margin="normal"
+                />
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>ID</TableCell>
+                            <TableCell>Локация</TableCell>
+                            <TableCell align="right">Действие</TableCell>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHead>
+                    <TableBody>
+                        {filteredSpots.map(spot => (
+                            <TableRow key={spot.id}>
+                                <TableCell>{spot.id}</TableCell>
+                                <TableCell>{spot.location}</TableCell>
+                                <TableCell align="right">
+                                    <Button
+                                        variant="contained"
+                                        size="small"
+                                        onClick={() => setSelectedSpot(spot)}
+                                    >
+                                        Забронировать
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </Paper>
             {selectedSpot && (
                 <ReservationDialog
                     parkingSpot={selectedSpot}
@@ -72,7 +79,7 @@ const ParkingSpotTable: React.FC = () => {
                     onReservationCreated={handleReservationCreated}
                 />
             )}
-        </Container>
+        </Layout>
     );
 };
 

@@ -14,7 +14,11 @@ interface ReservationDialogProps {
     onReservationCreated?: () => void;
 }
 
-const ReservationDialog: React.FC<ReservationDialogProps> = ({ parkingSpot, onClose, onReservationCreated }) => {
+const ReservationDialog: React.FC<ReservationDialogProps> = ({
+                                                                 parkingSpot,
+                                                                 onClose,
+                                                                 onReservationCreated
+                                                             }) => {
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [availableTimes, setAvailableTimes] = useState<string[]>([]);
     const [selectedTime, setSelectedTime] = useState('');
@@ -28,7 +32,7 @@ const ReservationDialog: React.FC<ReservationDialogProps> = ({ parkingSpot, onCl
                     const times = await getAvailableTimes(parkingSpot.id, dateString);
                     setAvailableTimes(times);
                     setSelectedTime('');
-                } catch (err) {
+                } catch {
                     setError('Ошибка загрузки временных слотов');
                 }
             };
@@ -55,20 +59,18 @@ const ReservationDialog: React.FC<ReservationDialogProps> = ({ parkingSpot, onCl
                 reserved_date: format(selectedDate, 'yyyy-MM-dd'),
                 reserved_time: selectedTime,
             });
-            if (onReservationCreated) {
-                onReservationCreated(); // Вызываем коллбэк после создания бронирования
-            }
+            onReservationCreated?.();
             onClose();
-        } catch (err) {
+        } catch {
             setError('Ошибка при бронировании');
         }
     };
 
     return (
-        <Dialog open={true} onClose={onClose}>
-            <DialogTitle>Бронирование места: {parkingSpot.location}</DialogTitle>
+        <Dialog open onClose={onClose} maxWidth="xs" fullWidth>
+            <DialogTitle>Бронирование: {parkingSpot.location}</DialogTitle>
             <DialogContent>
-                {error && <Typography color="error">{error}</Typography>}
+                {error && <Typography color="error" variant="body2">{error}</Typography>}
                 <TextField
                     label="Дата"
                     type="date"
@@ -77,14 +79,10 @@ const ReservationDialog: React.FC<ReservationDialogProps> = ({ parkingSpot, onCl
                     InputLabelProps={{ shrink: true }}
                     value={selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''}
                     onChange={(e) => {
-                        const value = e.target.value;
-                        const newDate = value ? new Date(value) : null;
-                        setSelectedDate(newDate);
+                        setSelectedDate(e.target.value ? new Date(e.target.value) : null);
                         setError('');
                     }}
-                    inputProps={{
-                        min: format(new Date(), 'yyyy-MM-dd'),
-                    }}
+                    inputProps={{ min: format(new Date(), 'yyyy-MM-dd') }}
                 />
                 {selectedDate && availableTimes.length > 0 && (
                     <FormControl fullWidth margin="normal">
@@ -104,12 +102,12 @@ const ReservationDialog: React.FC<ReservationDialogProps> = ({ parkingSpot, onCl
                     </FormControl>
                 )}
                 {selectedDate && availableTimes.length === 0 && (
-                    <Typography>Нет доступных временных слотов</Typography>
+                    <Typography variant="body2">Нет доступных временных слотов</Typography>
                 )}
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Отмена</Button>
-                <Button onClick={handleSubmit} disabled={!selectedTime} variant="contained">
+                <Button onClick={handleSubmit} variant="contained" disabled={!selectedTime}>
                     Забронировать
                 </Button>
             </DialogActions>
