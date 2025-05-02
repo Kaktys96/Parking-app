@@ -1,4 +1,3 @@
-// src/components/Layout.tsx
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, IconButton } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
@@ -16,8 +15,15 @@ const Layout: React.FC<LayoutProps> = ({ children, toggleTheme, mode }) => {
 
     const handleLogout = () => {
         localStorage.removeItem('token');
-        navigate('/login');
+        navigate('/login');  // Перенаправляем на страницу логина
     };
+
+    const handleLogin = () => {
+        navigate('/login');  // Перенаправляем на страницу логина
+    };
+
+    // Проверяем, есть ли токен в localStorage
+    const isAuthenticated = !!localStorage.getItem('token');
 
     return (
         <>
@@ -36,7 +42,12 @@ const Layout: React.FC<LayoutProps> = ({ children, toggleTheme, mode }) => {
                             {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
                         </IconButton>
                     )}
-                    <Button color="inherit" onClick={handleLogout}>Выйти</Button>
+                    {/* Логика отображения кнопки */}
+                    {isAuthenticated ? (
+                        <Button color="inherit" onClick={handleLogout}>Выйти</Button>
+                    ) : (
+                        <Button color="inherit" onClick={handleLogin}>Войти</Button>
+                    )}
                 </Toolbar>
             </AppBar>
             <main style={{ padding: '1rem' }}>{children}</main>

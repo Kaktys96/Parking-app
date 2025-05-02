@@ -14,7 +14,7 @@ interface AppProps {
 const App: React.FC<AppProps> = ({ toggleTheme, mode }) => {
     return (
         <Routes>
-            <Route path="/" element={<Navigate to="/parking-spots" />} />
+            <Route path="/" element={<Navigate to="/register" />} />
             <Route path="/parking-spots" element={<ParkingSpotTable />} />
             <Route path="/reservations" element={<ReservationHistory />} />
             <Route path="/register" element={<RegisterForm />} />
